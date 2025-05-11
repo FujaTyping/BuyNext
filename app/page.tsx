@@ -1,103 +1,131 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import axios from "axios";
+import ProductGrid from "./components/ProductGrid";
+import C1 from "@/assets/C1.png"
+import C2 from "@/assets/C2.png"
+import C3 from "@/assets/C3.png"
+import C4 from "@/assets/C4.png"
+import C5 from "@/assets/C5.png"
+import C6 from "@/assets/C6.png"
+import C7 from "@/assets/C7.png"
+import C8 from "@/assets/C8.png"
+import C9 from "@/assets/C9.png"
+import Link from "next/link";
+
+interface MarketItem {
+  id: string;
+  stock: number;
+  desc: string;
+  nameseller: string;
+  img: string;
+  uid: string;
+  rating: number;
+  imgseller: string;
+  title: string;
+  price: number;
+  createdAt: string;
+  category: string;
+}
+
+const categories = [
+  { name: "Music Products", icon: C1.src, alt: "Musical instruments and accessories", url: "/categories?c=music" },
+  { name: "Drinks", icon: C2.src, alt: "Beverages and drinks", url: "/categories?c=drink" },
+  { name: "Women's Fashion", icon: C3.src, alt: "Women's clothing and apparel", url: "/categories?c=women" },
+  { name: "Jewelry", icon: C4.src, alt: "Necklaces, rings, and bracelets", url: "/categories?c=jewelry" },
+  { name: "Bags & Luggage", icon: C5.src, alt: "Handbags, backpacks, and luggage", url: "/categories?c=bag" },
+  { name: "Men's Fashion", icon: C6.src, alt: "Men's clothing and apparel", url: "/categories?c=men" },
+  { name: "Furniture", icon: C7.src, alt: "Home and office furniture", url: "/categories?c=furniture" },
+  { name: "Beauty & Makeup", icon: C8.src, alt: "Cosmetics and makeup products", url: "/categories?c=makeup" },
+  { name: "Tech & Gadgets", icon: C9.src, alt: "Electronics and tech gadgets", url: "/categories?c=tech" },
+];
+
+interface Category {
+  name: string;
+  icon: string;
+  alt: string;
+}
+
+interface CategoryItemProps {
+  category: Category;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [data, setData] = useState<MarketItem[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/market");
+        if (response.status == 200) {
+          setData(response.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => (
+    <button className="flex flex-col items-center justify-start w-full p-3 text-center transition-all duration-200 ease-in-out rounded-lg hover:bg-gray-100 active:bg-gray-200 group">
+      <div className="flex items-center justify-center w-16 h-16 p-1 mb-2 overflow-hidden transition-transform duration-200 ease-in-out rounded-full bg-gray-50 group-hover:scale-105">
+        <img src={category.icon} alt={category.alt} className="object-contain w-full h-full" />
+      </div>
+      <h1 className="text-xs font-medium text-gray-700 sm:text-sm group-hover:text-blue-600">{category.name}</h1>
+    </button>
+  );
+
+  return (
+    <>
+      <main className="max-w-7xl mx-auto py-14">
+        <div>
+          <p className="mb-3 px-4">Categories</p>
+          <Swiper
+            spaceBetween={10}
+            slidesPerView={3}
+            breakpoints={{
+              480: {
+                slidesPerView: 4,
+                spaceBetween: 10,
+              },
+              640: {
+                slidesPerView: 5,
+                spaceBetween: 15,
+              },
+              1024: {
+                slidesPerView: 7,
+                spaceBetween: 15,
+              },
+            }}
+            className="mb-12"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {categories.map((category, index) => (
+              <SwiperSlide key={index}>
+                <Link href={`${category.url}`} className="cursor-pointer">
+                  <CategoryItem category={category} />
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+        <div>
+          {loading ? (
+            <>
+              <div className="flex justify-center items-center py-52">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-3 border-l-3 border-blue-500"></div>
+              </div>
+            </>
+          ) : <>
+            <p className="mb-3 px-4">Product</p>
+            <ProductGrid data={data} />
+          </>}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
